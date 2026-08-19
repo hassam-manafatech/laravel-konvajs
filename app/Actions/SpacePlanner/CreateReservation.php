@@ -22,8 +22,9 @@ class CreateReservation
         ProjectItem $clickedItem,
         string $customerName,
         CarbonInterface $reservationTime,
+        ?int $chairsCount = null,
     ): Reservation {
-        return DB::transaction(function () use ($project, $clickedItem, $customerName, $reservationTime) {
+        return DB::transaction(function () use ($project, $clickedItem, $customerName, $reservationTime, $chairsCount) {
             $targets = $this->resolveTargets($project, $clickedItem);
 
             $totalChairsInGroup = $targets->count();
@@ -34,6 +35,18 @@ class CreateReservation
                 throw ValidationException::withMessages([
                     'project_item_id' => __('All chairs in this group are already reserved.'),
                 ]);
+            }
+
+            if ($chairsCount !== null) {
+                if ($chairsCount > $available->count()) {
+                    throw ValidationException::withMessages([
+                        'chairs_count' => __('Only :available chair(s) are available in this group.', [
+                            'available' => $available->count(),
+                        ]),
+                    ]);
+                }
+
+                $available = $available->take($chairsCount);
             }
 
             $reservation = $project->reservations()->create([

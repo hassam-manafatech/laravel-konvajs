@@ -1,4 +1,4 @@
-import type { ProjectItem } from '@/types';
+import type { Project, ProjectItem, ReservationStatus } from '@/types';
 
 export type ItemBoundingBox = {
     x: number;
@@ -54,4 +54,48 @@ export function isTableItem(item: ProjectItem): boolean {
 
 export function isSeatingItem(item: ProjectItem): boolean {
     return item.furniture?.category === 'seating';
+}
+
+export const ACTIVE_RESERVATION_STATUSES: ReservationStatus[] = ['pending', 'confirmed', 'checked_in'];
+
+/** Chair `ProjectItem` ids currently tied to an active reservation. */
+export function reservedChairIds(reservations: Project['reservations']): Set<number> {
+    const ids = new Set<number>();
+
+    (reservations ?? [])
+        .filter((reservation) => ACTIVE_RESERVATION_STATUSES.includes(reservation.status))
+        .forEach((reservation) => (reservation.chairs ?? []).forEach((chair) => ids.add(chair.id)));
+
+    return ids;
+}
+
+function chairsForTable(table: ProjectItem, items: ProjectItem[]): ProjectItem[] {
+    if (!table.group_id) {
+        return [];
+    }
+
+    return (groupItemsById(items).get(table.group_id) ?? []).filter(isSeatingItem);
+}
+
+/** A table reads as reserved once every chair in its group is reserved; a lone chair reads as reserved on its own. */
+export function isItemReserved(item: ProjectItem, items: ProjectItem[], reservedIds: Set<number>): boolean {
+    if (reservedIds.has(item.id)) {
+        return true;
+    }
+
+    if (!isTableItem(item)) {
+        return false;
+    }
+
+    const chairs = chairsForTable(item, items);
+
+    return chairs.length > 0 && chairs.every((chair) => reservedIds.has(chair.id));
+}
+
+export function totalChairCountForTable(table: ProjectItem, items: ProjectItem[]): number {
+    return chairsForTable(table, items).length;
+}
+
+export function availableChairCountForTable(table: ProjectItem, items: ProjectItem[], reservedIds: Set<number>): number {
+    return chairsForTable(table, items).filter((chair) => !reservedIds.has(chair.id)).length;
 }

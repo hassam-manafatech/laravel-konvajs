@@ -46,6 +46,16 @@ class ProjectItemController extends Controller
     {
         Gate::authorize('update', $project);
 
+        $hasActiveReservation = $item->reservations()
+            ->whereIn('status', array_map(fn (ReservationStatus $status) => $status->value, ReservationStatus::active()))
+            ->exists();
+
+        if ($hasActiveReservation) {
+            throw ValidationException::withMessages([
+                'item' => __('This item has an active reservation and cannot be deleted.'),
+            ]);
+        }
+
         $item->delete();
 
         $this->recalculateProjectTotals->handle($project);

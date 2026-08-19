@@ -2,7 +2,6 @@ import { router } from '@inertiajs/react';
 import { Link2, Link2Off, ShieldAlert } from 'lucide-react';
 import { BrandColorPopover } from '@/components/space-planner/brand-color-popover';
 import { CapacityMeter } from '@/components/space-planner/capacity-meter';
-import { CostEstimatorSheet } from '@/components/space-planner/cost-estimator-sheet';
 import { ManageReservationsDialog } from '@/components/space-planner/manage-reservations-dialog';
 import { Button } from '@/components/ui/button';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
@@ -11,13 +10,12 @@ import type { UseReservationModalReturn } from '@/hooks/use-reservation-modal';
 import type { UseSpacePlannerTotalsReturn } from '@/hooks/use-space-planner-totals';
 import type { SpacePlannerViewMode } from '@/hooks/use-space-planner-view-mode';
 import { toggle as fireSafetyToggleRoute } from '@/routes/fire-safety';
-import type { EgressPath, FurnitureCatalogItem, Project, ProjectItem } from '@/types';
+import type { EgressPath, Project, ProjectItem } from '@/types';
 
 type SpacePlannerToolbarProps = {
     project: Project;
     items: ProjectItem[];
     egressPaths: EgressPath[];
-    furnitureCatalog: FurnitureCatalogItem[] | undefined;
     viewMode: SpacePlannerViewMode;
     onViewModeChange: (mode: SpacePlannerViewMode) => void;
     linking: UseNodeLinkingReturn;
@@ -30,7 +28,6 @@ export function SpacePlannerToolbar({
     project,
     items,
     egressPaths,
-    furnitureCatalog,
     viewMode,
     onViewModeChange,
     linking,
@@ -83,8 +80,6 @@ export function SpacePlannerToolbar({
             <BrandColorPopover color={project.brand_color} onChange={onBrandColorChange} />
 
             <ManageReservationsDialog project={project} items={items} egressPaths={egressPaths} reservationModal={reservationModal} />
-
-            <CostEstimatorSheet items={items} furnitureCatalog={furnitureCatalog} totalCost={totals.totalCost} />
 
             <div className="ml-auto">
                 <CapacityMeter totals={totals} />

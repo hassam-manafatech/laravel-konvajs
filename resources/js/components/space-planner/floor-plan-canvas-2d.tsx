@@ -32,7 +32,9 @@ type FloorPlanCanvas2DProps = {
     stageRef?: React.RefObject<Konva.Stage | null>;
 };
 
-const GRID_STROKE = '#d6d3d1';
+const GRID_MINOR_STROKE = 'rgba(31, 58, 95, 0.06)';
+const GRID_MAJOR_STROKE = 'rgba(31, 58, 95, 0.14)';
+const GRID_MAJOR_INTERVAL_METERS = 5;
 const PADDING_METERS = 1;
 
 export function FloorPlanCanvas2D({
@@ -68,14 +70,22 @@ export function FloorPlanCanvas2D({
             return [];
         }
 
-        const lines: { key: string; points: number[] }[] = [];
+        const lines: { key: string; points: number[]; major: boolean }[] = [];
 
         for (let x = 0; x <= widthMeters; x += 1) {
-            lines.push({ key: `v-${x}`, points: [metersToPixels(x), 0, metersToPixels(x), stageHeight] });
+            lines.push({
+                key: `v-${x}`,
+                points: [metersToPixels(x), 0, metersToPixels(x), stageHeight],
+                major: x % GRID_MAJOR_INTERVAL_METERS === 0,
+            });
         }
 
         for (let y = 0; y <= heightMeters; y += 1) {
-            lines.push({ key: `h-${y}`, points: [0, metersToPixels(y), stageWidth, metersToPixels(y)] });
+            lines.push({
+                key: `h-${y}`,
+                points: [0, metersToPixels(y), stageWidth, metersToPixels(y)],
+                major: y % GRID_MAJOR_INTERVAL_METERS === 0,
+            });
         }
 
         return lines;
@@ -105,7 +115,13 @@ export function FloorPlanCanvas2D({
             >
                 <Layer x={offset} y={offset}>
                     {gridLines.map((line) => (
-                        <Line key={line.key} points={line.points} stroke={GRID_STROKE} strokeWidth={1} listening={false} />
+                        <Line
+                            key={line.key}
+                            points={line.points}
+                            stroke={line.major ? GRID_MAJOR_STROKE : GRID_MINOR_STROKE}
+                            strokeWidth={line.major ? 1.25 : 1}
+                            listening={false}
+                        />
                     ))}
                 </Layer>
 
@@ -121,7 +137,7 @@ export function FloorPlanCanvas2D({
                             isLinkAnchor={anchorItemId === item.id}
                             isPendingLinkMember={pendingMemberIds.includes(item.id)}
                             brandColor={brandColor}
-                            draggable={mode === 'edit' && linkToolState === 'idle'}
+                            draggable={mode === 'edit' && linkToolState === 'idle' && !(isReserved?.(item) ?? false)}
                             onSelect={onSelectItem}
                             onDragEnd={onMoveItem}
                             onClick={onItemClick}

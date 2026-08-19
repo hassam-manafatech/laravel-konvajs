@@ -14,6 +14,13 @@ export type ReservationStatus =
 
 export type TemplateType = 'cafe' | 'co_working' | 'boutique' | 'restaurant';
 
+export type FurnitureRenderShape = 'round' | 'rect' | 'chair' | 'stool' | 'plant' | 'shelf';
+
+export type FurnitureRenderMetadata = {
+    shape?: FurnitureRenderShape;
+    brand_accent?: boolean;
+};
+
 export type FurnitureCatalogItem = {
     id: number;
     name: string;
@@ -24,7 +31,7 @@ export type FurnitureCatalogItem = {
     price: string;
     seat_capacity: number;
     default_color: string;
-    render_metadata: Record<string, unknown> | null;
+    render_metadata: FurnitureRenderMetadata | null;
     created_at: string | null;
     updated_at: string | null;
 };

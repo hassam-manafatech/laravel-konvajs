@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { deleteJson, postJson } from '@/lib/space-planner-api';
+import { toast } from 'sonner';
+import { deleteJson, postJson, SpacePlannerApiError } from '@/lib/space-planner-api';
 import { destroy as destroyItemRoute, link as linkRoute, sync as syncRoute, unlink as unlinkRoute } from '@/routes/project-items';
 import type { FurnitureCatalogItem, Project, ProjectItem, SyncProjectItemInput } from '@/types';
 
@@ -171,13 +172,30 @@ export function useSpacePlannerItems(project: Project): UseSpacePlannerItemsRetu
 
     const deleteItem = useCallback(
         async (id: number) => {
-            setItems((current) => current.filter((item) => item.id !== id));
+            let removed: ProjectItem | undefined;
+
+            setItems((current) => {
+                removed = current.find((item) => item.id === id);
+
+                return current.filter((item) => item.id !== id);
+            });
 
             if (id < 0) {
                 return;
             }
 
-            await deleteJson(destroyItemRoute.url({ project: project.id, item: id }));
+            try {
+                await deleteJson(destroyItemRoute.url({ project: project.id, item: id }));
+            } catch (error) {
+                setItems((current) => (removed ? [...current, removed] : current));
+
+                const message =
+                    error instanceof SpacePlannerApiError
+                        ? (error.payload?.errors?.item?.[0] ?? error.message)
+                        : 'Failed to delete item.';
+
+                toast.error(message);
+            }
         },
         [project.id],
     );

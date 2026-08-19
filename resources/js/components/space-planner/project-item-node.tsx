@@ -4,6 +4,8 @@ import { isSeatingItem } from '@/lib/space-planner-groups';
 import { metersToPixels, pixelsToMeters } from '@/lib/space-planner-units';
 import type { ProjectItem } from '@/types';
 
+const CIRCLE_SHAPES = new Set(['round', 'chair', 'stool']);
+
 type ProjectItemNodeProps = {
     item: ProjectItem;
     isSelected: boolean;
@@ -38,9 +40,13 @@ export function ProjectItemNode({
     const x = metersToPixels(parseFloat(item.x_coord));
     const y = metersToPixels(parseFloat(item.y_coord));
 
-    const fill = isReserved ? RESERVED_FILL : (item.custom_color ?? item.furniture?.default_color ?? brandColor);
+    const renderMetadata = item.furniture?.render_metadata;
+    const fill = isReserved
+        ? RESERVED_FILL
+        : (item.custom_color ?? (renderMetadata?.brand_accent ? brandColor : item.furniture?.default_color) ?? brandColor);
     const opacity = isReserved ? 0.55 : 1;
-    const seating = isSeatingItem(item);
+    const shapeHint = renderMetadata?.shape;
+    const isCircle = shapeHint ? CIRCLE_SHAPES.has(shapeHint) : isSeatingItem(item);
 
     const handleDragEnd = (event: Konva.KonvaEventObject<DragEvent>) => {
         const node = event.target;
@@ -64,7 +70,7 @@ export function ProjectItemNode({
             }}
             onDragEnd={handleDragEnd}
         >
-            {seating ? (
+            {isCircle ? (
                 <Circle
                     radius={Math.min(width, height) / 2}
                     fill={fill}

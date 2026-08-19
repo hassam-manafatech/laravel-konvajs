@@ -33,6 +33,7 @@ class StoreReservationRequest extends FormRequest
             ],
             'customer_name' => ['required', 'string', 'max:255'],
             'reservation_time' => ['required', 'date', 'after_or_equal:now'],
+            'chairs_count' => ['nullable', 'integer', 'min:1'],
         ];
     }
 }

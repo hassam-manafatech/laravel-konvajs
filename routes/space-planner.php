@@ -22,6 +22,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('projects/{project}/items/unlink', [ProjectItemController::class, 'unlink'])->name('project-items.unlink');
 
         Route::post('projects/{project}/reservations', [ReservationController::class, 'store'])->name('reservations.store');
+        Route::post('projects/{project}/reservations/release', [ReservationController::class, 'release'])->name('reservations.release');
         Route::patch('projects/{project}/reservations/{reservation}', [ReservationController::class, 'update'])->name('reservations.update');
 
         Route::patch('projects/{project}/fire-safety', [FireSafetyController::class, 'toggle'])->name('fire-safety.toggle');

@@ -1,10 +1,13 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { FloorPlanCanvas2D } from '@/components/space-planner/floor-plan-canvas-2d';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Separator } from '@/components/ui/separator';
 import type { UseReservationModalReturn } from '@/hooks/use-reservation-modal';
+import { availableChairCountForTable, isTableItem, totalChairCountForTable } from '@/lib/space-planner-groups';
 import type { EgressPath, Project, ProjectItem } from '@/types';
 
 type ManageReservationsDialogProps = {
@@ -18,13 +21,47 @@ export function ManageReservationsDialog({ project, items, egressPaths, reservat
     const [customerName, setCustomerName] = useState('');
     const [reservationTime, setReservationTime] = useState('');
     const [selectedId, setSelectedId] = useState<number | null>(null);
+    const [selectedTableId, setSelectedTableId] = useState<string>('');
+    const [chairsCount, setChairsCount] = useState(1);
 
     const handleItemClick = (item: ProjectItem) => {
-        if (!customerName || !reservationTime || reservationModal.isReserved(item)) {
+        if (reservationModal.isReserved(item)) {
+            reservationModal.release(item);
+
+            return;
+        }
+
+        if (!customerName || !reservationTime) {
             return;
         }
 
         reservationModal.reserve(item, customerName, reservationTime);
+    };
+
+    const tableOptions = useMemo(
+        () =>
+            items
+                .filter(isTableItem)
+                .map((table) => ({
+                    table,
+                    total: totalChairCountForTable(table, items),
+                    available: availableChairCountForTable(table, items, reservationModal.reservedItemIds),
+                }))
+                .filter((option) => option.total > 0),
+        [items, reservationModal.reservedItemIds],
+    );
+
+    const selectedTableOption = tableOptions.find((option) => String(option.table.id) === selectedTableId);
+    const canQuickReserve = Boolean(selectedTableOption && customerName && reservationTime && chairsCount >= 1);
+
+    const handleQuickReserve = () => {
+        if (!selectedTableOption || !canQuickReserve) {
+            return;
+        }
+
+        reservationModal.reserve(selectedTableOption.table, customerName, reservationTime, chairsCount);
+        setSelectedTableId('');
+        setChairsCount(1);
     };
 
     return (
@@ -38,7 +75,8 @@ export function ManageReservationsDialog({ project, items, egressPaths, reservat
                 <DialogHeader>
                     <DialogTitle>Manage reservations</DialogTitle>
                     <DialogDescription>
-                        Click a table to reserve every chair in its group, or click a single chair to reserve just that seat.
+                        Click a table to reserve every chair in its group, or click a single chair to reserve just that seat. Click a
+                        reserved table or chair again to release it.
                     </DialogDescription>
                 </DialogHeader>
 
@@ -80,8 +118,43 @@ export function ManageReservationsDialog({ project, items, egressPaths, reservat
                             />
                         </div>
                         <p className="text-xs text-muted-foreground">
-                            Fill in the details, then click a table or chair on the floor plan to reserve it.
+                            Fill in the details, then click a table or chair on the floor plan to reserve it. Click it again anytime
+                            to release it.
                         </p>
+
+                        <Separator />
+
+                        <div className="space-y-1">
+                            <Label>Quick reserve by table</Label>
+                            <Select value={selectedTableId} onValueChange={setSelectedTableId}>
+                                <SelectTrigger className="w-full">
+                                    <SelectValue placeholder="Choose a table" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {tableOptions.map(({ table, total, available }) => (
+                                        <SelectItem key={table.id} value={String(table.id)} disabled={available === 0}>
+                                            {table.furniture?.name ?? 'Table'} — {available}/{total} available
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+
+                        <div className="space-y-1">
+                            <Label htmlFor="reservation-chairs-count">Chairs to reserve</Label>
+                            <Input
+                                id="reservation-chairs-count"
+                                type="number"
+                                min={1}
+                                max={selectedTableOption?.available ?? 1}
+                                value={chairsCount}
+                                onChange={(event) => setChairsCount(Number(event.target.value))}
+                            />
+                        </div>
+
+                        <Button size="sm" className="w-full" disabled={!canQuickReserve} onClick={handleQuickReserve}>
+                            Reserve chairs
+                        </Button>
                     </div>
                 </div>
             </DialogContent>
