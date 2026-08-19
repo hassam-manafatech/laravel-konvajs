@@ -3,16 +3,23 @@
 namespace Database\Factories;
 
 use App\Enums\ReservationStatus;
-use App\Models\Project;
-use App\Models\ProjectItem;
-use App\Models\Reservation;
+use App\Models\SpacePlannerProject;
+use App\Models\SpacePlannerProjectItem;
+use App\Models\SpacePlannerReservation;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends Factory<Reservation>
+ * @extends Factory<SpacePlannerReservation>
  */
 class ReservationFactory extends Factory
 {
+    /**
+     * The name of the factory's corresponding model.
+     *
+     * @var class-string<SpacePlannerReservation>
+     */
+    protected $model = SpacePlannerReservation::class;
+
     /**
      * Define the model's default state.
      *
@@ -21,8 +28,8 @@ class ReservationFactory extends Factory
     public function definition(): array
     {
         return [
-            'project_id' => Project::factory(),
-            'table_item_id' => ProjectItem::factory(),
+            'project_id' => SpacePlannerProject::factory(),
+            'table_item_id' => SpacePlannerProjectItem::factory(),
             'group_id' => null,
             'customer_name' => fake()->name(),
             'reservation_time' => fake()->dateTimeBetween('now', '+1 month'),

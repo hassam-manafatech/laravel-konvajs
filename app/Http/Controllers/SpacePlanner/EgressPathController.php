@@ -5,8 +5,8 @@ namespace App\Http\Controllers\SpacePlanner;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SpacePlanner\StoreEgressPathRequest;
 use App\Http\Requests\SpacePlanner\UpdateEgressPathRequest;
-use App\Models\EgressPath;
-use App\Models\Project;
+use App\Models\SpacePlannerEgressPath;
+use App\Models\SpacePlannerProject;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
@@ -16,7 +16,7 @@ class EgressPathController extends Controller
     /**
      * Add an egress path to the project.
      */
-    public function store(StoreEgressPathRequest $request, Project $project): RedirectResponse
+    public function store(StoreEgressPathRequest $request, SpacePlannerProject $project): RedirectResponse
     {
         $project->egressPaths()->create($request->validated());
 
@@ -28,7 +28,7 @@ class EgressPathController extends Controller
     /**
      * Update an existing egress path.
      */
-    public function update(UpdateEgressPathRequest $request, Project $project, EgressPath $egressPath): RedirectResponse
+    public function update(UpdateEgressPathRequest $request, SpacePlannerProject $project, SpacePlannerEgressPath $egressPath): RedirectResponse
     {
         $egressPath->update($request->validated());
 
@@ -40,7 +40,7 @@ class EgressPathController extends Controller
     /**
      * Remove an egress path.
      */
-    public function destroy(Project $project, EgressPath $egressPath): RedirectResponse
+    public function destroy(SpacePlannerProject $project, SpacePlannerEgressPath $egressPath): RedirectResponse
     {
         Gate::authorize('update', $project);
 

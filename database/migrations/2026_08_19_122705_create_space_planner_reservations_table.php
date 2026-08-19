@@ -11,10 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('reservations', function (Blueprint $table) {
+        Schema::create('space_planner_reservations', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('project_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('table_item_id')->constrained('project_items')->cascadeOnDelete();
+            $table->foreignId('project_id')->constrained('space_planner_projects')->cascadeOnDelete();
+            $table->foreignId('table_item_id')->constrained('space_planner_project_items')->cascadeOnDelete();
             $table->uuid('group_id')->nullable();
             $table->string('customer_name');
             $table->dateTime('reservation_time');
@@ -33,6 +33,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('reservations');
+        Schema::dropIfExists('space_planner_reservations');
     }
 };

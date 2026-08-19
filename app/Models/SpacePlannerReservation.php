@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\ReservationStatus;
 use Database\Factories\ReservationFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -26,41 +27,56 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $updated_at
  */
 #[Fillable(['table_item_id', 'group_id', 'customer_name', 'reservation_time', 'status', 'total_chairs_in_group', 'reserved_chairs_count'])]
-class Reservation extends Model
+class SpacePlannerReservation extends Model
 {
     /** @use HasFactory<ReservationFactory> */
     use HasFactory;
 
     /**
-     * @return BelongsTo<Project, $this>
+     * Create a new factory instance for the model.
+     *
+     * @return Factory<static>
+     */
+    protected static function newFactory(): Factory
+    {
+        return ReservationFactory::new();
+    }
+
+    /**
+     * @return BelongsTo<SpacePlannerProject, $this>
      */
     public function project(): BelongsTo
     {
-        return $this->belongsTo(Project::class);
+        return $this->belongsTo(SpacePlannerProject::class, 'project_id');
     }
 
     /**
-     * @return BelongsTo<ProjectItem, $this>
+     * @return BelongsTo<SpacePlannerProjectItem, $this>
      */
     public function anchorItem(): BelongsTo
     {
-        return $this->belongsTo(ProjectItem::class, 'table_item_id');
+        return $this->belongsTo(SpacePlannerProjectItem::class, 'table_item_id');
     }
 
     /**
-     * @return HasMany<ReservationItem, $this>
+     * @return HasMany<SpacePlannerReservationItem, $this>
      */
     public function reservationItems(): HasMany
     {
-        return $this->hasMany(ReservationItem::class);
+        return $this->hasMany(SpacePlannerReservationItem::class, 'reservation_id');
     }
 
     /**
-     * @return BelongsToMany<ProjectItem, $this>
+     * @return BelongsToMany<SpacePlannerProjectItem, $this>
      */
     public function chairs(): BelongsToMany
     {
-        return $this->belongsToMany(ProjectItem::class, 'reservation_items');
+        return $this->belongsToMany(
+            SpacePlannerProjectItem::class,
+            'space_planner_reservation_items',
+            'reservation_id',
+            'project_item_id',
+        );
     }
 
     /**

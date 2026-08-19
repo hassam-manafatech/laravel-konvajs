@@ -1,16 +1,16 @@
 <?php
 
 use App\Actions\SpacePlanner\RecalculateProjectTotals;
-use App\Models\FurnitureCatalog;
-use App\Models\Project;
-use App\Models\ProjectItem;
+use App\Models\SpacePlannerFurnitureCatalog;
+use App\Models\SpacePlannerProject;
+use App\Models\SpacePlannerProjectItem;
 use App\Models\User;
 
 test('syncing project items upserts position, rotation, and color and recalculates totals', function () {
     $user = User::factory()->create();
-    $project = Project::factory()->for($user)->create();
-    $chair = FurnitureCatalog::factory()->chair()->create(['price' => 80]);
-    $existing = ProjectItem::factory()->for($project)->create([
+    $project = SpacePlannerProject::factory()->for($user)->create();
+    $chair = SpacePlannerFurnitureCatalog::factory()->chair()->create(['price' => 80]);
+    $existing = SpacePlannerProjectItem::factory()->for($project, 'project')->create([
         'furniture_id' => $chair->id,
         'x_coord' => 0,
         'y_coord' => 0,
@@ -50,9 +50,9 @@ test('syncing project items upserts position, rotation, and color and recalculat
 
 test('deleting a project item recalculates totals', function () {
     $user = User::factory()->create();
-    $project = Project::factory()->for($user)->create();
-    $chair = FurnitureCatalog::factory()->chair()->create(['price' => 80]);
-    $item = ProjectItem::factory()->for($project)->create(['furniture_id' => $chair->id]);
+    $project = SpacePlannerProject::factory()->for($user)->create();
+    $chair = SpacePlannerFurnitureCatalog::factory()->chair()->create(['price' => 80]);
+    $item = SpacePlannerProjectItem::factory()->for($project, 'project')->create(['furniture_id' => $chair->id]);
     app(RecalculateProjectTotals::class)->handle($project);
 
     expect($project->fresh()->total_seats)->toBe(1);

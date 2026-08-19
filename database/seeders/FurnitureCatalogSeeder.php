@@ -3,7 +3,7 @@
 namespace Database\Seeders;
 
 use App\Enums\FurnitureCategory;
-use App\Models\FurnitureCatalog;
+use App\Models\SpacePlannerFurnitureCatalog;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -41,7 +41,7 @@ class FurnitureCatalogSeeder extends Seeder
         ];
 
         foreach ($items as $item) {
-            FurnitureCatalog::query()->create($item);
+            SpacePlannerFurnitureCatalog::query()->create($item);
         }
     }
 }

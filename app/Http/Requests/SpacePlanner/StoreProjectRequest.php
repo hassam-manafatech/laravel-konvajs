@@ -18,7 +18,7 @@ class StoreProjectRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'template_id' => ['nullable', 'integer', 'exists:templates,id'],
+            'template_id' => ['nullable', 'integer', 'exists:space_planner_templates,id'],
             'name' => ['required', 'string', 'max:255'],
             'width_m' => ['required_without:template_id', 'numeric', 'min:1', 'max:200'],
             'height_m' => ['required_without:template_id', 'numeric', 'min:1', 'max:200'],

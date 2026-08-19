@@ -33,9 +33,9 @@ class SyncProjectItemsRequest extends FormRequest
             'items.*.id' => [
                 'nullable',
                 'integer',
-                Rule::exists('project_items', 'id')->where('project_id', $projectId),
+                Rule::exists('space_planner_project_items', 'id')->where('project_id', $projectId),
             ],
-            'items.*.furniture_id' => ['required_without:items.*.id', 'integer', 'exists:furniture_catalog,id'],
+            'items.*.furniture_id' => ['required_without:items.*.id', 'integer', 'exists:space_planner_furniture_catalog,id'],
             'items.*.x_coord' => ['required', 'numeric'],
             'items.*.y_coord' => ['required', 'numeric'],
             'items.*.rotation' => ['nullable', 'numeric', 'between:0,359.99'],

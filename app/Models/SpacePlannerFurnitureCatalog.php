@@ -6,6 +6,7 @@ use App\Enums\FurnitureCategory;
 use Database\Factories\FurnitureCatalogFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Table;
+use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -25,19 +26,29 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
-#[Table('furniture_catalog')]
+#[Table('space_planner_furniture_catalog')]
 #[Fillable(['name', 'category', 'width_m', 'depth_m', 'height_m', 'price', 'seat_capacity', 'default_color', 'render_metadata'])]
-class FurnitureCatalog extends Model
+class SpacePlannerFurnitureCatalog extends Model
 {
     /** @use HasFactory<FurnitureCatalogFactory> */
     use HasFactory;
 
     /**
-     * @return HasMany<ProjectItem, $this>
+     * Create a new factory instance for the model.
+     *
+     * @return Factory<static>
+     */
+    protected static function newFactory(): Factory
+    {
+        return FurnitureCatalogFactory::new();
+    }
+
+    /**
+     * @return HasMany<SpacePlannerProjectItem, $this>
      */
     public function projectItems(): HasMany
     {
-        return $this->hasMany(ProjectItem::class, 'furniture_id');
+        return $this->hasMany(SpacePlannerProjectItem::class, 'furniture_id');
     }
 
     /**

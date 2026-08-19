@@ -4,8 +4,8 @@ namespace App\Actions\SpacePlanner;
 
 use App\Enums\FurnitureCategory;
 use App\Enums\ReservationStatus;
-use App\Models\Project;
-use App\Models\ProjectItem;
+use App\Models\SpacePlannerProject;
+use App\Models\SpacePlannerProjectItem;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
@@ -14,7 +14,7 @@ class ReleaseReservation
     /**
      * Free a clicked table's whole reserved chair group, or a single reserved chair.
      */
-    public function handle(Project $project, ProjectItem $clickedItem): int
+    public function handle(SpacePlannerProject $project, SpacePlannerProjectItem $clickedItem): int
     {
         return DB::transaction(function () use ($project, $clickedItem) {
             $targets = $this->resolveTargets($project, $clickedItem);
@@ -41,9 +41,9 @@ class ReleaseReservation
     }
 
     /**
-     * @return Collection<int, ProjectItem>
+     * @return Collection<int, SpacePlannerProjectItem>
      */
-    private function resolveTargets(Project $project, ProjectItem $clickedItem): Collection
+    private function resolveTargets(SpacePlannerProject $project, SpacePlannerProjectItem $clickedItem): Collection
     {
         $isTable = $clickedItem->furniture->category === FurnitureCategory::Table;
 

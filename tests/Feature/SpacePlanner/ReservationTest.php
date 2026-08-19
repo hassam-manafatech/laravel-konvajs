@@ -1,22 +1,22 @@
 <?php
 
-use App\Models\FurnitureCatalog;
-use App\Models\Project;
-use App\Models\ProjectItem;
+use App\Models\SpacePlannerFurnitureCatalog;
+use App\Models\SpacePlannerProject;
+use App\Models\SpacePlannerProjectItem;
 use App\Models\User;
 use Illuminate\Support\Str;
 
-function createTableWithChairs(Project $project, int $chairCount): array
+function createTableWithChairs(SpacePlannerProject $project, int $chairCount): array
 {
     $groupId = (string) Str::uuid();
 
-    $table = ProjectItem::factory()->for($project)->create([
-        'furniture_id' => FurnitureCatalog::factory()->table()->create()->id,
+    $table = SpacePlannerProjectItem::factory()->for($project, 'project')->create([
+        'furniture_id' => SpacePlannerFurnitureCatalog::factory()->table()->create()->id,
         'group_id' => $groupId,
     ]);
 
-    $chairs = ProjectItem::factory()->for($project)->count($chairCount)->create([
-        'furniture_id' => FurnitureCatalog::factory()->chair()->create()->id,
+    $chairs = SpacePlannerProjectItem::factory()->for($project, 'project')->count($chairCount)->create([
+        'furniture_id' => SpacePlannerFurnitureCatalog::factory()->chair()->create()->id,
         'group_id' => $groupId,
     ]);
 
@@ -25,7 +25,7 @@ function createTableWithChairs(Project $project, int $chairCount): array
 
 test('reserving a table reserves every chair in its group', function () {
     $user = User::factory()->create();
-    $project = Project::factory()->for($user)->create();
+    $project = SpacePlannerProject::factory()->for($user)->create();
     [$table, $chairs] = createTableWithChairs($project, 4);
 
     $response = $this->actingAs($user)->post(route('reservations.store', $project), [
@@ -44,7 +44,7 @@ test('reserving a table reserves every chair in its group', function () {
 
 test('reserving a single chair only reserves that chair even if it belongs to a group', function () {
     $user = User::factory()->create();
-    $project = Project::factory()->for($user)->create();
+    $project = SpacePlannerProject::factory()->for($user)->create();
     [$table, $chairs] = createTableWithChairs($project, 4);
 
     $response = $this->actingAs($user)->post(route('reservations.store', $project), [
@@ -62,7 +62,7 @@ test('reserving a single chair only reserves that chair even if it belongs to a 
 
 test('partial-group reservation only claims currently available chairs', function () {
     $user = User::factory()->create();
-    $project = Project::factory()->for($user)->create();
+    $project = SpacePlannerProject::factory()->for($user)->create();
     [$table, $chairs] = createTableWithChairs($project, 4);
 
     $this->actingAs($user)->post(route('reservations.store', $project), [
@@ -82,14 +82,14 @@ test('partial-group reservation only claims currently available chairs', functio
     $reservation = $project->reservations()->where('customer_name', 'Alice')->firstOrFail();
     expect($reservation->total_chairs_in_group)->toBe(4);
     expect($reservation->reserved_chairs_count)->toBe(3);
-    expect($reservation->chairs()->pluck('project_items.id'))->not->toContain($chairs->first()->id);
+    expect($reservation->chairs()->pluck('space_planner_project_items.id'))->not->toContain($chairs->first()->id);
 });
 
 test('double reserving an already reserved chair fails', function () {
     $user = User::factory()->create();
-    $project = Project::factory()->for($user)->create();
-    $chair = ProjectItem::factory()->for($project)->create([
-        'furniture_id' => FurnitureCatalog::factory()->chair()->create()->id,
+    $project = SpacePlannerProject::factory()->for($user)->create();
+    $chair = SpacePlannerProjectItem::factory()->for($project, 'project')->create([
+        'furniture_id' => SpacePlannerFurnitureCatalog::factory()->chair()->create()->id,
     ]);
 
     $this->actingAs($user)->post(route('reservations.store', $project), [
@@ -109,9 +109,9 @@ test('double reserving an already reserved chair fails', function () {
 
 test('cancelling a reservation frees the chair for a new reservation', function () {
     $user = User::factory()->create();
-    $project = Project::factory()->for($user)->create();
-    $chair = ProjectItem::factory()->for($project)->create([
-        'furniture_id' => FurnitureCatalog::factory()->chair()->create()->id,
+    $project = SpacePlannerProject::factory()->for($user)->create();
+    $chair = SpacePlannerProjectItem::factory()->for($project, 'project')->create([
+        'furniture_id' => SpacePlannerFurnitureCatalog::factory()->chair()->create()->id,
     ]);
 
     $this->actingAs($user)->post(route('reservations.store', $project), [

@@ -29,7 +29,7 @@ class UnlinkProjectItemsRequest extends FormRequest
             'item_ids' => ['required', 'array', 'min:1'],
             'item_ids.*' => [
                 'integer',
-                Rule::exists('project_items', 'id')->where('project_id', $projectId),
+                Rule::exists('space_planner_project_items', 'id')->where('project_id', $projectId),
             ],
         ];
     }

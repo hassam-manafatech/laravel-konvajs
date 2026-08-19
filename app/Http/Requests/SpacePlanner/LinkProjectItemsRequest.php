@@ -29,12 +29,12 @@ class LinkProjectItemsRequest extends FormRequest
             'table_item_id' => [
                 'required',
                 'integer',
-                Rule::exists('project_items', 'id')->where('project_id', $projectId),
+                Rule::exists('space_planner_project_items', 'id')->where('project_id', $projectId),
             ],
             'chair_item_ids' => ['required', 'array', 'min:1'],
             'chair_item_ids.*' => [
                 'integer',
-                Rule::exists('project_items', 'id')->where('project_id', $projectId),
+                Rule::exists('space_planner_project_items', 'id')->where('project_id', $projectId),
             ],
         ];
     }

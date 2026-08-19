@@ -3,7 +3,7 @@
 namespace Database\Seeders;
 
 use App\Enums\TemplateType;
-use App\Models\Template;
+use App\Models\SpacePlannerTemplate;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -24,7 +24,7 @@ class TemplateSeeder extends Seeder
         ];
 
         foreach ($templates as $template) {
-            Template::query()->create($template);
+            SpacePlannerTemplate::query()->create($template);
         }
     }
 }

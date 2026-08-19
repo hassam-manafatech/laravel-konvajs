@@ -1,26 +1,26 @@
 <?php
 
 use App\Enums\ReservationStatus;
-use App\Models\FurnitureCatalog;
-use App\Models\Project;
-use App\Models\ProjectItem;
-use App\Models\Reservation;
+use App\Models\SpacePlannerFurnitureCatalog;
+use App\Models\SpacePlannerProject;
+use App\Models\SpacePlannerProjectItem;
+use App\Models\SpacePlannerReservation;
 use App\Models\User;
 use Illuminate\Support\Str;
 
 test('linking assigns a shared group id to a table and its chairs', function () {
     $user = User::factory()->create();
-    $project = Project::factory()->for($user)->create();
-    $table = ProjectItem::factory()->for($project)->create([
-        'furniture_id' => FurnitureCatalog::factory()->table()->create()->id,
+    $project = SpacePlannerProject::factory()->for($user)->create();
+    $table = SpacePlannerProjectItem::factory()->for($project, 'project')->create([
+        'furniture_id' => SpacePlannerFurnitureCatalog::factory()->table()->create()->id,
         'group_id' => null,
     ]);
-    $chair1 = ProjectItem::factory()->for($project)->create([
-        'furniture_id' => FurnitureCatalog::factory()->chair()->create()->id,
+    $chair1 = SpacePlannerProjectItem::factory()->for($project, 'project')->create([
+        'furniture_id' => SpacePlannerFurnitureCatalog::factory()->chair()->create()->id,
         'group_id' => null,
     ]);
-    $chair2 = ProjectItem::factory()->for($project)->create([
-        'furniture_id' => FurnitureCatalog::factory()->chair()->create()->id,
+    $chair2 = SpacePlannerProjectItem::factory()->for($project, 'project')->create([
+        'furniture_id' => SpacePlannerFurnitureCatalog::factory()->chair()->create()->id,
         'group_id' => null,
     ]);
 
@@ -42,9 +42,9 @@ test('linking assigns a shared group id to a table and its chairs', function () 
 
 test('unlinking clears the shared group id', function () {
     $user = User::factory()->create();
-    $project = Project::factory()->for($user)->create();
+    $project = SpacePlannerProject::factory()->for($user)->create();
     $groupId = (string) Str::uuid();
-    $chair = ProjectItem::factory()->for($project)->create(['group_id' => $groupId]);
+    $chair = SpacePlannerProjectItem::factory()->for($project, 'project')->create(['group_id' => $groupId]);
 
     $response = $this->actingAs($user)->postJson(route('project-items.unlink', $project), [
         'item_ids' => [$chair->id],
@@ -56,18 +56,18 @@ test('unlinking clears the shared group id', function () {
 
 test('unlinking a chair with an active reservation is rejected', function () {
     $user = User::factory()->create();
-    $project = Project::factory()->for($user)->create();
+    $project = SpacePlannerProject::factory()->for($user)->create();
     $groupId = (string) Str::uuid();
-    $table = ProjectItem::factory()->for($project)->create([
-        'furniture_id' => FurnitureCatalog::factory()->table()->create()->id,
+    $table = SpacePlannerProjectItem::factory()->for($project, 'project')->create([
+        'furniture_id' => SpacePlannerFurnitureCatalog::factory()->table()->create()->id,
         'group_id' => $groupId,
     ]);
-    $chair = ProjectItem::factory()->for($project)->create([
-        'furniture_id' => FurnitureCatalog::factory()->chair()->create()->id,
+    $chair = SpacePlannerProjectItem::factory()->for($project, 'project')->create([
+        'furniture_id' => SpacePlannerFurnitureCatalog::factory()->chair()->create()->id,
         'group_id' => $groupId,
     ]);
 
-    $reservation = Reservation::factory()->for($project)->create([
+    $reservation = SpacePlannerReservation::factory()->for($project, 'project')->create([
         'table_item_id' => $table->id,
         'group_id' => $groupId,
         'status' => ReservationStatus::Confirmed,

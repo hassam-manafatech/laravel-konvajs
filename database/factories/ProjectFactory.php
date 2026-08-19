@@ -2,15 +2,22 @@
 
 namespace Database\Factories;
 
-use App\Models\Project;
+use App\Models\SpacePlannerProject;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends Factory<Project>
+ * @extends Factory<SpacePlannerProject>
  */
 class ProjectFactory extends Factory
 {
+    /**
+     * The name of the factory's corresponding model.
+     *
+     * @var class-string<SpacePlannerProject>
+     */
+    protected $model = SpacePlannerProject::class;
+
     /**
      * Define the model's default state.
      *

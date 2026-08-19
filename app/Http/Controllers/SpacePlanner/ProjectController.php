@@ -6,9 +6,9 @@ use App\Actions\SpacePlanner\SeedStarterProjectLayout;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SpacePlanner\StoreProjectRequest;
 use App\Http\Requests\SpacePlanner\UpdateProjectRequest;
-use App\Models\FurnitureCatalog;
-use App\Models\Project;
-use App\Models\Template;
+use App\Models\SpacePlannerFurnitureCatalog;
+use App\Models\SpacePlannerProject;
+use App\Models\SpacePlannerTemplate;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -24,7 +24,7 @@ class ProjectController extends Controller
      */
     public function index(Request $request): Response
     {
-        $projects = Project::query()
+        $projects = SpacePlannerProject::query()
             ->where('user_id', $request->user()->id)
             ->latest()
             ->get();
@@ -40,7 +40,7 @@ class ProjectController extends Controller
     public function create(): Response
     {
         return Inertia::render('space-planner/create', [
-            'templates' => Inertia::defer(fn () => Template::query()->get()),
+            'templates' => Inertia::defer(fn () => SpacePlannerTemplate::query()->get()),
         ]);
     }
 
@@ -51,9 +51,9 @@ class ProjectController extends Controller
     {
         $validated = $request->validated();
 
-        $template = isset($validated['template_id']) ? Template::query()->find($validated['template_id']) : null;
+        $template = isset($validated['template_id']) ? SpacePlannerTemplate::query()->find($validated['template_id']) : null;
 
-        $project = new Project($validated);
+        $project = new SpacePlannerProject($validated);
         $project->user_id = $request->user()->id;
         $project->template_id = $template?->id;
         $project->width_m = $validated['width_m'] ?? $template?->default_width_m ?? 10;
@@ -71,7 +71,7 @@ class ProjectController extends Controller
     /**
      * Display the given project's workspace.
      */
-    public function show(Project $project): Response
+    public function show(SpacePlannerProject $project): Response
     {
         Gate::authorize('view', $project);
 
@@ -79,14 +79,14 @@ class ProjectController extends Controller
 
         return Inertia::render('space-planner/show', [
             'project' => $project,
-            'furnitureCatalog' => Inertia::defer(fn () => FurnitureCatalog::query()->get()),
+            'furnitureCatalog' => Inertia::defer(fn () => SpacePlannerFurnitureCatalog::query()->get()),
         ]);
     }
 
     /**
      * Update the given project's settings.
      */
-    public function update(UpdateProjectRequest $request, Project $project): RedirectResponse
+    public function update(UpdateProjectRequest $request, SpacePlannerProject $project): RedirectResponse
     {
         $project->fill($request->validated())->save();
 
@@ -98,7 +98,7 @@ class ProjectController extends Controller
     /**
      * Delete the given project.
      */
-    public function destroy(Project $project): RedirectResponse
+    public function destroy(SpacePlannerProject $project): RedirectResponse
     {
         Gate::authorize('delete', $project);
 

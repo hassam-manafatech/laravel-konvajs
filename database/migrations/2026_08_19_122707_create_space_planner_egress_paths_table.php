@@ -11,13 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('reservation_items', function (Blueprint $table) {
+        Schema::create('space_planner_egress_paths', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('reservation_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('project_item_id')->constrained('project_items')->cascadeOnDelete();
+            $table->foreignId('project_id')->constrained('space_planner_projects')->cascadeOnDelete();
+            $table->json('path_points');
+            $table->string('door_label')->nullable();
             $table->timestamps();
-
-            $table->unique(['reservation_id', 'project_item_id']);
         });
     }
 
@@ -26,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('reservation_items');
+        Schema::dropIfExists('space_planner_egress_paths');
     }
 };

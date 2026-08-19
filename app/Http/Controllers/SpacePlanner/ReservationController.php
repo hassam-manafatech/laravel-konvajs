@@ -8,8 +8,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\SpacePlanner\ReleaseReservationRequest;
 use App\Http\Requests\SpacePlanner\StoreReservationRequest;
 use App\Http\Requests\SpacePlanner\UpdateReservationRequest;
-use App\Models\Project;
-use App\Models\Reservation;
+use App\Models\SpacePlannerProject;
+use App\Models\SpacePlannerReservation;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Carbon;
 use Inertia\Inertia;
@@ -24,7 +24,7 @@ class ReservationController extends Controller
     /**
      * Reserve a table's whole chair group, or a single chair.
      */
-    public function store(StoreReservationRequest $request, Project $project): RedirectResponse
+    public function store(StoreReservationRequest $request, SpacePlannerProject $project): RedirectResponse
     {
         $item = $project->items()->whereKey($request->validated('project_item_id'))->firstOrFail();
 
@@ -50,7 +50,7 @@ class ReservationController extends Controller
     /**
      * Free a table's whole reserved chair group, or a single reserved chair.
      */
-    public function release(ReleaseReservationRequest $request, Project $project): RedirectResponse
+    public function release(ReleaseReservationRequest $request, SpacePlannerProject $project): RedirectResponse
     {
         $item = $project->items()->whereKey($request->validated('project_item_id'))->firstOrFail();
 
@@ -69,7 +69,7 @@ class ReservationController extends Controller
     /**
      * Update a reservation's status.
      */
-    public function update(UpdateReservationRequest $request, Project $project, Reservation $reservation): RedirectResponse
+    public function update(UpdateReservationRequest $request, SpacePlannerProject $project, SpacePlannerReservation $reservation): RedirectResponse
     {
         $reservation->update($request->validated());
 

@@ -3,14 +3,21 @@
 namespace Database\Factories;
 
 use App\Enums\TemplateType;
-use App\Models\Template;
+use App\Models\SpacePlannerTemplate;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends Factory<Template>
+ * @extends Factory<SpacePlannerTemplate>
  */
 class TemplateFactory extends Factory
 {
+    /**
+     * The name of the factory's corresponding model.
+     *
+     * @var class-string<SpacePlannerTemplate>
+     */
+    protected $model = SpacePlannerTemplate::class;
+
     /**
      * Define the model's default state.
      *

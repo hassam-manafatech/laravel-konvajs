@@ -3,8 +3,8 @@
 namespace App\Actions\SpacePlanner;
 
 use App\Enums\FurnitureCategory;
-use App\Models\FurnitureCatalog;
-use App\Models\Project;
+use App\Models\SpacePlannerFurnitureCatalog;
+use App\Models\SpacePlannerProject;
 use Illuminate\Support\Str;
 
 class SeedStarterProjectLayout
@@ -14,10 +14,10 @@ class SeedStarterProjectLayout
     /**
      * Seed a brand-new project with 2 tables (linked to 4 and 6 chairs).
      */
-    public function handle(Project $project): void
+    public function handle(SpacePlannerProject $project): void
     {
-        $table = FurnitureCatalog::query()->where('category', FurnitureCategory::Table->value)->first();
-        $chair = FurnitureCatalog::query()->where('category', FurnitureCategory::Seating->value)->first();
+        $table = SpacePlannerFurnitureCatalog::query()->where('category', FurnitureCategory::Table->value)->first();
+        $chair = SpacePlannerFurnitureCatalog::query()->where('category', FurnitureCategory::Seating->value)->first();
 
         if (! $table || ! $chair) {
             return;
@@ -30,9 +30,9 @@ class SeedStarterProjectLayout
     }
 
     private function seedTableWithChairs(
-        Project $project,
-        FurnitureCatalog $table,
-        FurnitureCatalog $chair,
+        SpacePlannerProject $project,
+        SpacePlannerFurnitureCatalog $table,
+        SpacePlannerFurnitureCatalog $chair,
         int $chairCount,
         float $tableX,
         float $tableY,

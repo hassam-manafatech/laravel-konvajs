@@ -3,14 +3,21 @@
 namespace Database\Factories;
 
 use App\Enums\FurnitureCategory;
-use App\Models\FurnitureCatalog;
+use App\Models\SpacePlannerFurnitureCatalog;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends Factory<FurnitureCatalog>
+ * @extends Factory<SpacePlannerFurnitureCatalog>
  */
 class FurnitureCatalogFactory extends Factory
 {
+    /**
+     * The name of the factory's corresponding model.
+     *
+     * @var class-string<SpacePlannerFurnitureCatalog>
+     */
+    protected $model = SpacePlannerFurnitureCatalog::class;
+
     /**
      * Define the model's default state.
      *

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Database\Factories\ReservationItemFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -17,24 +18,34 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $updated_at
  */
 #[Fillable(['reservation_id', 'project_item_id'])]
-class ReservationItem extends Model
+class SpacePlannerReservationItem extends Model
 {
     /** @use HasFactory<ReservationItemFactory> */
     use HasFactory;
 
     /**
-     * @return BelongsTo<Reservation, $this>
+     * Create a new factory instance for the model.
+     *
+     * @return Factory<static>
      */
-    public function reservation(): BelongsTo
+    protected static function newFactory(): Factory
     {
-        return $this->belongsTo(Reservation::class);
+        return ReservationItemFactory::new();
     }
 
     /**
-     * @return BelongsTo<ProjectItem, $this>
+     * @return BelongsTo<SpacePlannerReservation, $this>
+     */
+    public function reservation(): BelongsTo
+    {
+        return $this->belongsTo(SpacePlannerReservation::class, 'reservation_id');
+    }
+
+    /**
+     * @return BelongsTo<SpacePlannerProjectItem, $this>
      */
     public function projectItem(): BelongsTo
     {
-        return $this->belongsTo(ProjectItem::class);
+        return $this->belongsTo(SpacePlannerProjectItem::class, 'project_item_id');
     }
 }

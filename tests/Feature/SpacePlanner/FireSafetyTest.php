@@ -1,11 +1,11 @@
 <?php
 
-use App\Models\Project;
+use App\Models\SpacePlannerProject;
 use App\Models\User;
 
 test('toggling fire safety flips the flag', function () {
     $user = User::factory()->create();
-    $project = Project::factory()->for($user)->create(['fire_safety_active' => false]);
+    $project = SpacePlannerProject::factory()->for($user)->create(['fire_safety_active' => false]);
 
     $this->actingAs($user)->patch(route('fire-safety.toggle', $project))->assertRedirect();
     expect($project->fresh()->fire_safety_active)->toBeTrue();
@@ -16,7 +16,7 @@ test('toggling fire safety flips the flag', function () {
 
 test('egress paths can be created, updated, and deleted for a project', function () {
     $user = User::factory()->create();
-    $project = Project::factory()->for($user)->create();
+    $project = SpacePlannerProject::factory()->for($user)->create();
 
     $response = $this->actingAs($user)->post(route('egress-paths.store', $project), [
         'path_points' => [['x' => 0, 'y' => 0], ['x' => 5, 'y' => 0]],
@@ -39,7 +39,7 @@ test('egress paths can be created, updated, and deleted for a project', function
 test('another user cannot manage this project\'s egress paths', function () {
     $owner = User::factory()->create();
     $intruder = User::factory()->create();
-    $project = Project::factory()->for($owner)->create();
+    $project = SpacePlannerProject::factory()->for($owner)->create();
 
     $this->actingAs($intruder)->post(route('egress-paths.store', $project), [
         'path_points' => [['x' => 0, 'y' => 0], ['x' => 1, 'y' => 1]],

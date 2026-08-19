@@ -11,10 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('projects', function (Blueprint $table) {
+        Schema::create('space_planner_projects', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('template_id')->nullable()->constrained()->nullOnDelete();
+            $table->foreignId('template_id')->nullable()->constrained('space_planner_templates')->nullOnDelete();
             $table->string('name');
             $table->decimal('width_m', 6, 2);
             $table->decimal('height_m', 6, 2);
@@ -34,6 +34,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('projects');
+        Schema::dropIfExists('space_planner_projects');
     }
 };

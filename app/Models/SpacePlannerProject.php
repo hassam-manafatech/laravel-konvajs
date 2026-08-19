@@ -6,6 +6,7 @@ use App\Policies\ProjectPolicy;
 use Database\Factories\ProjectFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\UsePolicy;
+use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -29,10 +30,20 @@ use Illuminate\Support\Carbon;
  */
 #[Fillable(['name', 'width_m', 'height_m', 'brand_color', 'show_blueprint_grid'])]
 #[UsePolicy(ProjectPolicy::class)]
-class Project extends Model
+class SpacePlannerProject extends Model
 {
     /** @use HasFactory<ProjectFactory> */
     use HasFactory;
+
+    /**
+     * Create a new factory instance for the model.
+     *
+     * @return Factory<static>
+     */
+    protected static function newFactory(): Factory
+    {
+        return ProjectFactory::new();
+    }
 
     /**
      * @return BelongsTo<User, $this>
@@ -43,35 +54,35 @@ class Project extends Model
     }
 
     /**
-     * @return BelongsTo<Template, $this>
+     * @return BelongsTo<SpacePlannerTemplate, $this>
      */
     public function template(): BelongsTo
     {
-        return $this->belongsTo(Template::class);
+        return $this->belongsTo(SpacePlannerTemplate::class, 'template_id');
     }
 
     /**
-     * @return HasMany<ProjectItem, $this>
+     * @return HasMany<SpacePlannerProjectItem, $this>
      */
     public function items(): HasMany
     {
-        return $this->hasMany(ProjectItem::class);
+        return $this->hasMany(SpacePlannerProjectItem::class, 'project_id');
     }
 
     /**
-     * @return HasMany<Reservation, $this>
+     * @return HasMany<SpacePlannerReservation, $this>
      */
     public function reservations(): HasMany
     {
-        return $this->hasMany(Reservation::class);
+        return $this->hasMany(SpacePlannerReservation::class, 'project_id');
     }
 
     /**
-     * @return HasMany<EgressPath, $this>
+     * @return HasMany<SpacePlannerEgressPath, $this>
      */
     public function egressPaths(): HasMany
     {
-        return $this->hasMany(EgressPath::class);
+        return $this->hasMany(SpacePlannerEgressPath::class, 'project_id');
     }
 
     /**

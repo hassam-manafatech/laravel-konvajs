@@ -2,16 +2,23 @@
 
 namespace Database\Factories;
 
-use App\Models\ProjectItem;
-use App\Models\Reservation;
-use App\Models\ReservationItem;
+use App\Models\SpacePlannerProjectItem;
+use App\Models\SpacePlannerReservation;
+use App\Models\SpacePlannerReservationItem;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends Factory<ReservationItem>
+ * @extends Factory<SpacePlannerReservationItem>
  */
 class ReservationItemFactory extends Factory
 {
+    /**
+     * The name of the factory's corresponding model.
+     *
+     * @var class-string<SpacePlannerReservationItem>
+     */
+    protected $model = SpacePlannerReservationItem::class;
+
     /**
      * Define the model's default state.
      *
@@ -20,8 +27,8 @@ class ReservationItemFactory extends Factory
     public function definition(): array
     {
         return [
-            'reservation_id' => Reservation::factory(),
-            'project_item_id' => ProjectItem::factory(),
+            'reservation_id' => SpacePlannerReservation::factory(),
+            'project_item_id' => SpacePlannerProjectItem::factory(),
         ];
     }
 }

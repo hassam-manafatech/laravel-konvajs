@@ -29,7 +29,7 @@ class StoreReservationRequest extends FormRequest
             'project_item_id' => [
                 'required',
                 'integer',
-                Rule::exists('project_items', 'id')->where('project_id', $projectId),
+                Rule::exists('space_planner_project_items', 'id')->where('project_id', $projectId),
             ],
             'customer_name' => ['required', 'string', 'max:255'],
             'reservation_time' => ['required', 'date', 'after_or_equal:now'],

@@ -4,9 +4,9 @@ namespace App\Actions\SpacePlanner;
 
 use App\Enums\FurnitureCategory;
 use App\Enums\ReservationStatus;
-use App\Models\Project;
-use App\Models\ProjectItem;
-use App\Models\Reservation;
+use App\Models\SpacePlannerProject;
+use App\Models\SpacePlannerProjectItem;
+use App\Models\SpacePlannerReservation;
 use Carbon\CarbonInterface;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -18,18 +18,18 @@ class CreateReservation
      * Reserve a clicked table's whole chair group, or a single clicked chair.
      */
     public function handle(
-        Project $project,
-        ProjectItem $clickedItem,
+        SpacePlannerProject $project,
+        SpacePlannerProjectItem $clickedItem,
         string $customerName,
         CarbonInterface $reservationTime,
         ?int $chairsCount = null,
-    ): Reservation {
+    ): SpacePlannerReservation {
         return DB::transaction(function () use ($project, $clickedItem, $customerName, $reservationTime, $chairsCount) {
             $targets = $this->resolveTargets($project, $clickedItem);
 
             $totalChairsInGroup = $targets->count();
 
-            $available = $targets->reject(fn (ProjectItem $item) => $this->hasActiveReservation($item));
+            $available = $targets->reject(fn (SpacePlannerProjectItem $item) => $this->hasActiveReservation($item));
 
             if ($available->isEmpty()) {
                 throw ValidationException::withMessages([
@@ -66,9 +66,9 @@ class CreateReservation
     }
 
     /**
-     * @return Collection<int, ProjectItem>
+     * @return Collection<int, SpacePlannerProjectItem>
      */
-    private function resolveTargets(Project $project, ProjectItem $clickedItem): Collection
+    private function resolveTargets(SpacePlannerProject $project, SpacePlannerProjectItem $clickedItem): Collection
     {
         $isTable = $clickedItem->furniture->category === FurnitureCategory::Table;
 
@@ -82,7 +82,7 @@ class CreateReservation
         return collect([$clickedItem]);
     }
 
-    private function hasActiveReservation(ProjectItem $item): bool
+    private function hasActiveReservation(SpacePlannerProjectItem $item): bool
     {
         $activeStatuses = array_map(fn (ReservationStatus $status) => $status->value, ReservationStatus::active());
 

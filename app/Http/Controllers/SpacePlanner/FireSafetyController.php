@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\SpacePlanner;
 
 use App\Http\Controllers\Controller;
-use App\Models\Project;
+use App\Models\SpacePlannerProject;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
@@ -13,7 +13,7 @@ class FireSafetyController extends Controller
     /**
      * Toggle the project's fire-safety egress display.
      */
-    public function toggle(Project $project): RedirectResponse
+    public function toggle(SpacePlannerProject $project): RedirectResponse
     {
         Gate::authorize('update', $project);
 

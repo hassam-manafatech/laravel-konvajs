@@ -1,12 +1,12 @@
 <?php
 
-use App\Models\FurnitureCatalog;
-use App\Models\Project;
+use App\Models\SpacePlannerFurnitureCatalog;
+use App\Models\SpacePlannerProject;
 use App\Models\User;
 
 beforeEach(function () {
-    FurnitureCatalog::factory()->table()->create(['price' => 200]);
-    FurnitureCatalog::factory()->chair()->create(['price' => 50]);
+    SpacePlannerFurnitureCatalog::factory()->table()->create(['price' => 200]);
+    SpacePlannerFurnitureCatalog::factory()->chair()->create(['price' => 50]);
 });
 
 test('creating a project seeds a starter layout of 2 tables and 4/6 linked chairs', function () {
@@ -19,7 +19,7 @@ test('creating a project seeds a starter layout of 2 tables and 4/6 linked chair
         'brand_color' => '#112233',
     ]);
 
-    $project = Project::query()->where('user_id', $user->id)->firstOrFail();
+    $project = SpacePlannerProject::query()->where('user_id', $user->id)->firstOrFail();
 
     $response->assertRedirect(route('projects.show', $project));
 

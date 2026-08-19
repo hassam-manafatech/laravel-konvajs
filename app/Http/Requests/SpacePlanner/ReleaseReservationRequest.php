@@ -29,7 +29,7 @@ class ReleaseReservationRequest extends FormRequest
             'project_item_id' => [
                 'required',
                 'integer',
-                Rule::exists('project_items', 'id')->where('project_id', $projectId),
+                Rule::exists('space_planner_project_items', 'id')->where('project_id', $projectId),
             ],
         ];
     }

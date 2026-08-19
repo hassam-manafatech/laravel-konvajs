@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('furniture_catalog', function (Blueprint $table) {
+        Schema::create('space_planner_furniture_catalog', function (Blueprint $table) {
             $table->id();
             $table->string('name');
             $table->string('category');
@@ -33,6 +33,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('furniture_catalog');
+        Schema::dropIfExists('space_planner_furniture_catalog');
     }
 };

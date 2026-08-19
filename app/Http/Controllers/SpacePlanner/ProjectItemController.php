@@ -8,8 +8,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\SpacePlanner\LinkProjectItemsRequest;
 use App\Http\Requests\SpacePlanner\SyncProjectItemsRequest;
 use App\Http\Requests\SpacePlanner\UnlinkProjectItemsRequest;
-use App\Models\Project;
-use App\Models\ProjectItem;
+use App\Models\SpacePlannerProject;
+use App\Models\SpacePlannerProjectItem;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
@@ -22,7 +22,7 @@ class ProjectItemController extends Controller
     /**
      * Upsert placed furniture items (position, rotation, color) for a project.
      */
-    public function sync(SyncProjectItemsRequest $request, Project $project): JsonResponse
+    public function sync(SyncProjectItemsRequest $request, SpacePlannerProject $project): JsonResponse
     {
         foreach ($request->validated('items') as $itemInput) {
             if (! empty($itemInput['id'])) {
@@ -42,7 +42,7 @@ class ProjectItemController extends Controller
     /**
      * Remove a placed item from a project.
      */
-    public function destroy(Project $project, ProjectItem $item): JsonResponse
+    public function destroy(SpacePlannerProject $project, SpacePlannerProjectItem $item): JsonResponse
     {
         Gate::authorize('update', $project);
 
@@ -66,7 +66,7 @@ class ProjectItemController extends Controller
     /**
      * Link a table item with one or more chair items into a shared group.
      */
-    public function link(LinkProjectItemsRequest $request, Project $project): JsonResponse
+    public function link(LinkProjectItemsRequest $request, SpacePlannerProject $project): JsonResponse
     {
         $tableItem = $project->items()->whereKey($request->validated('table_item_id'))->firstOrFail();
 
@@ -84,11 +84,11 @@ class ProjectItemController extends Controller
     /**
      * Clear the shared group on the given items.
      */
-    public function unlink(UnlinkProjectItemsRequest $request, Project $project): JsonResponse
+    public function unlink(UnlinkProjectItemsRequest $request, SpacePlannerProject $project): JsonResponse
     {
         $itemIds = $request->validated('item_ids');
 
-        $hasActiveReservation = ProjectItem::query()
+        $hasActiveReservation = SpacePlannerProjectItem::query()
             ->whereIn('id', $itemIds)
             ->whereHas('reservations', fn ($query) => $query->whereIn('status', array_map(
                 fn (ReservationStatus $status) => $status->value,

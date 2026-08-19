@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Database\Factories\ProjectItemFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -24,33 +25,48 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $updated_at
  */
 #[Fillable(['furniture_id', 'group_id', 'x_coord', 'y_coord', 'rotation', 'custom_color', 'meta_data'])]
-class ProjectItem extends Model
+class SpacePlannerProjectItem extends Model
 {
     /** @use HasFactory<ProjectItemFactory> */
     use HasFactory;
 
     /**
-     * @return BelongsTo<Project, $this>
+     * Create a new factory instance for the model.
+     *
+     * @return Factory<static>
+     */
+    protected static function newFactory(): Factory
+    {
+        return ProjectItemFactory::new();
+    }
+
+    /**
+     * @return BelongsTo<SpacePlannerProject, $this>
      */
     public function project(): BelongsTo
     {
-        return $this->belongsTo(Project::class);
+        return $this->belongsTo(SpacePlannerProject::class, 'project_id');
     }
 
     /**
-     * @return BelongsTo<FurnitureCatalog, $this>
+     * @return BelongsTo<SpacePlannerFurnitureCatalog, $this>
      */
     public function furniture(): BelongsTo
     {
-        return $this->belongsTo(FurnitureCatalog::class, 'furniture_id');
+        return $this->belongsTo(SpacePlannerFurnitureCatalog::class, 'furniture_id');
     }
 
     /**
-     * @return BelongsToMany<Reservation, $this>
+     * @return BelongsToMany<SpacePlannerReservation, $this>
      */
     public function reservations(): BelongsToMany
     {
-        return $this->belongsToMany(Reservation::class, 'reservation_items');
+        return $this->belongsToMany(
+            SpacePlannerReservation::class,
+            'space_planner_reservation_items',
+            'project_item_id',
+            'reservation_id',
+        );
     }
 
     /**

@@ -11,10 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('project_items', function (Blueprint $table) {
+        Schema::create('space_planner_project_items', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('project_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('furniture_id')->constrained('furniture_catalog')->cascadeOnDelete();
+            $table->foreignId('project_id')->constrained('space_planner_projects')->cascadeOnDelete();
+            $table->foreignId('furniture_id')->constrained('space_planner_furniture_catalog')->cascadeOnDelete();
             $table->uuid('group_id')->nullable();
             $table->decimal('x_coord', 8, 2);
             $table->decimal('y_coord', 8, 2);
@@ -33,6 +33,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('project_items');
+        Schema::dropIfExists('space_planner_project_items');
     }
 };
